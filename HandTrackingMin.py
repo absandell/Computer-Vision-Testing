@@ -20,7 +20,12 @@ while True:
     if results.multi_hand_landmarks:
         for handLandmarks in results.multi_hand_landmarks: # Extract info from each hand
             for id, landmark in enumerate(handLandmarks.landmark):
-                print(id, landmark)
+                #print(id, landmark)
+                h, w, c = img.shape
+                cx, cy, = int(landmark.x*w), int(landmark.y*h)
+                print(id, cx, cy)
+                if id == 0:
+                    cv2.circle(img, (cx, cy), 20, (0, 255, 255), cv2.FILLED) # Draws circle on specific  reference point id
             mpDraw.draw_landmarks(img, handLandmarks, mpHands.HAND_CONNECTIONS) # Draw on original image (each hand)
 
     # FPS Measure
