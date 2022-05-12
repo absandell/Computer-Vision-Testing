@@ -68,13 +68,15 @@ class poseDetector():
                                      self.smooth_segmentation, self.detectionCon, self.trackCon)
 
     def findPose(self, img, draw=True):
+        if img is None:
+            return img
+
         img = ResizeWithAspectRatio(img, width=500)
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.results = self.pose.process(imgRGB)
         if (self.results.pose_landmarks):
             if draw:
                 self.mpDraw.draw_landmarks(img, self.results.pose_landmarks, self.mpPose.POSE_CONNECTIONS)
-
         return img
 
     def findPosition(self, img, draw=True):
@@ -88,24 +90,27 @@ class poseDetector():
         return landmarkList
 
 def main():
-    cap = cv2.VideoCapture('PoseVideos/4.mp4')
+    cap = cv2.VideoCapture('PoseVideos/6.mp4')
     previousTime = 0
     currentTime = 0
     detector = poseDetector()
     while True:
         success, img = cap.read()
-        img = detector.findPose(img)
-        landmarkList = detector.findPosition(img)
-        print(landmarkList[14])
+        if img is not None:
+            img = detector.findPose(img)
+            landmarkList = detector.findPosition(img)
+            print(landmarkList[14])
 
-        # FPS Measure
-        currentTime = time.time()
-        fps = 1 / (currentTime - previousTime)
-        previousTime = currentTime
-        cv2.putText(img, str(int(fps)), (10, 70), cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 255), 2)
+            # FPS Measure
+            currentTime = time.time()
+            fps = 1 / (currentTime - previousTime)
+            previousTime = currentTime
+            cv2.putText(img, str(int(fps)), (10, 70), cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 255), 2)
 
-        cv2.imshow("Image", img)  # Display Image
-        cv2.waitKey(1)  # Refresh
+            cv2.imshow("Image", img)  # Display Image
+            cv2.waitKey(1)  # Refresh
+        else:
+            break
 
 
 if __name__ == "__main__":
